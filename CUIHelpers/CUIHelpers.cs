@@ -17,14 +17,20 @@ namespace CUIHelpers
                 try
                 {
                     var input = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(input))
+                    if (string.IsNullOrWhiteSpace(input) && predicate(defaultValue))
                     {
                         return defaultValue;
+                    } 
+                    else if (string.IsNullOrWhiteSpace(input))
+                    {
+                        notifyFaiure(null, defaultValue.ToString());
+                        continue;
                     }
                     result = convert(input);
                     if(!predicate(result))
                     {
                         notifyFaiure(null, input);
+                        continue;
                     }
                     return result;
                 }
@@ -45,7 +51,7 @@ namespace CUIHelpers
             yield return $"Labaratory work {number}";
             yield return problem;
             yield return $"Variant {variant}";
-            yield return $"Default parameters:\n{defaultParameters.Aggregate((res, x) => res + "\nx")}";
+            yield return $"Default parameters:\n{defaultParameters.Aggregate((res, x) => res + $"\n{x}")}";
 
         }
 
