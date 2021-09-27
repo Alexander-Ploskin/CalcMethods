@@ -15,16 +15,6 @@ namespace Lab1
 
         }
 
-        static int EnterIntegerParameter(Predicate<int> predicate)
-        {
-            var result = 0;
-            while(!int.TryParse(Console.ReadLine(), out result) || !predicate(result))
-            {
-                Console.WriteLine("Enter correct value");
-            }
-            return result;
-        }
-
         static void Main(string[] args)
         {
             foreach(var message in Introduce())
@@ -32,12 +22,12 @@ namespace Lab1
                 Console.WriteLine(message);
             }
             Console.WriteLine("Enter amount of chunks to detach roots");
-            var chunksCount = EnterIntegerParameter(x => x > 0);
+            var chunksCount = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 0);
 
-            var func = new Func<double, double>(x => 10 * Math.Cos(x) - 0.1 * x * x);
-            var derivative = new Func<double, double>(x => -10 * Math.Sin(x) - 0.2 * x);
-            var section = (-8, 2);
-            var accuracy = 1.0e-5;
+            var func = new Func<double, double>(x => 8 * Math.Cos(x) - x - 6);
+            var derivative = new Func<double, double>(x => -8 * Math.Sin(x) - 1);
+            var section = (-10, 2);
+            var accuracy = 1.0e-12;
 
             var splittedSection = NonLinearEquations.Split(func, section, chunksCount).ToList();
             Console.WriteLine();
