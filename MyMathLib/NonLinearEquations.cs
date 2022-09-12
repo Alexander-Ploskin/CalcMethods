@@ -69,11 +69,13 @@ namespace MyMathLib
         #region BisectionMethod
         static (double a, double b) BisectionMethodCore(Func<double, double> func, (double a, double b) section, double accuracy, ref int counter)
         {
-            counter++;
-            var c = (section.a + section.b) / 2;
-            return section.b - section.a < 2 * accuracy
-                ? section
-                : BisectionMethodCore(func, func(section.a) * func(c) <= 0 ? (section.a, c) : (c, section.b), accuracy, ref counter);
+            while(section.b - section.a > 2 * accuracy)
+            {
+                counter++;
+                var c = (section.a + section.b) / 2;
+                section = func(section.a) * func(c) <= 0 ? (section.a, c) : (c, section.b);
+            }
+            return section;
         }
 
         static MethodResult BisectionMethod(Func<double, double> func, (double a, double b) section, double accuracy)
@@ -87,19 +89,25 @@ namespace MyMathLib
         #region NewtonMethod
         static (double x, double nextX) NewtonMethodCore(Func<double, double> func, Func<double, double> derivative, double x, double accuracy, ref int counter, int p = 1)
         {
-            counter++;
-            var nextX = x - func(x) * p / derivative(x);
-            return Math.Abs(x - nextX) > accuracy ? NewtonMethodCore(func, derivative, nextX, accuracy, ref counter, p) : (x, nextX);
+            var prevPoint = 0d;
+            var currentPoint = x;
+            do
+            {
+                prevPoint = currentPoint;
+                currentPoint = prevPoint - func(prevPoint) / derivative(prevPoint);
+                counter++;
+            } while(Math.Abs(currentPoint - prevPoint) > accuracy);
+            return (prevPoint, currentPoint);
         }
 
         static MethodResult NewtonMethod(Func<double, double> func, Func<double, double> derivative, (double a, double b) section, double accuracy)
         {
             if (derivative == null)
             {
-                throw new ArgumentException("Specify derivatice to use Newthon method");
+                throw new ArgumentException("Specify the derivative function to use Newthon method");
             }
             var counter = 0;
-            var (x, nextX) = NewtonMethodCore(func, derivative, derivative(section.a) != 0 ? section.a : section.a - accuracy, accuracy, ref counter);
+            var (x, nextX) = NewtonMethodCore(func, derivative, derivative(section.a) != 0 ? section.a : section.a + accuracy, accuracy, ref counter);
             return new MethodResult(section.a, counter, nextX, Math.Abs(x - nextX), Math.Abs(func(nextX)));
         }
         #endregion
@@ -109,7 +117,7 @@ namespace MyMathLib
         {
             if (derivative == null)
             {
-                throw new ArgumentException("Specify derivatice to use Newthon method");
+                throw new ArgumentException("Specify the derivative function to use Newthon method");
             }
             var counter = 0;
             var (x, nextX) = NewtonMethodCore(func, x => derivative(section.a), derivative(section.a) != 0 ? section.a : section.a + accuracy, accuracy, ref counter);
@@ -120,10 +128,14 @@ namespace MyMathLib
         #region SecantMethod
         static (double x, double nextX) SecantMethodCore(Func<double, double> func, double x, double nextX, double accuracy, ref int counter)
         {
-            counter++;
-            return Math.Abs(x - nextX) > accuracy
-                ? SecantMethodCore(func, nextX, x - func(x) * (nextX - x) / (func(nextX) - func(x)), accuracy, ref counter)
-                : (x, nextX);
+            while(Math.Abs(x - nextX) > accuracy)
+            {
+                counter++;
+                var temp = nextX;
+                nextX = x - func(x) * (nextX - x) / (func(nextX) - func(x));
+                x = temp;
+            }
+            return (x, nextX);
         }
 
 
