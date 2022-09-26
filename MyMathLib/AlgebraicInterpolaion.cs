@@ -13,9 +13,11 @@ namespace MyMathLib
         }
 
         static double Lagrange(List<(double x, double fx)> sourceTable, int polynomDegree, double interpolationPoint)
-            => Enumerable.Range(0, polynomDegree).Aggregate(0d, (res, i) => 
-                            res += sourceTable[i].fx * Enumerable.Range(0, polynomDegree).Aggregate(1d, (res, j) =>
-                                    i == j ? res : res * (interpolationPoint - sourceTable[j].x) / (sourceTable[i].x - sourceTable[j].x)));
+            => Enumerable.Range(0, polynomDegree)
+                         .Aggregate(0d, (res, i) => 
+                            res += sourceTable[i].fx *
+                                    Enumerable.Range(0, polynomDegree).Aggregate(1d, (res, j) =>
+                                        i == j ? res : res * (interpolationPoint - sourceTable[j].x) / (sourceTable[i].x - sourceTable[j].x)));
 
         static double Newton(List<(double x, double fx)> sourceTable, int polynomDegree, double interpolationPoint)
         {
@@ -52,15 +54,12 @@ namespace MyMathLib
 
         public static double GetInterpolationPolynome(List<(double, double)> sourceTable, int polynomDegree, double interpolationPoint, Method method)
         {
-            switch(method)
+            return method switch
             {
-                case Method.Lagrange:
-                    return Lagrange(sourceTable, polynomDegree, interpolationPoint);
-                case Method.Newton:
-                    return Newton(sourceTable, polynomDegree, interpolationPoint);
-                default:
-                    throw new ArgumentException("Unknown value for Method");
-            }
+                Method.Lagrange => Lagrange(sourceTable, polynomDegree, interpolationPoint),
+                Method.Newton => Newton(sourceTable, polynomDegree, interpolationPoint),
+                _ => throw new ArgumentException("Unknown value for Method")
+            };
         }
     }
 }
