@@ -55,7 +55,7 @@ namespace CUIHelpers
 
         }
 
-        public static void Introduce(int number, string problem, string[] defaultParameters, int variant = 5)
+        public static void Introduce(int number, string problem, string[] defaultParameters, int variant = 13)
         {
             foreach(var message in Introduction(number, problem, defaultParameters, variant))
             {

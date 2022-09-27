@@ -62,7 +62,7 @@ namespace Lab2
         static void Main(string[] args)
         {
             CUIHelpers.CUIHelpers.Introduce(2, "Algebraic interpolation problem",
-                new[] { "f(x) ln(1 + x) - exp(x)", "[a, b] = [1, 10]", "m = 15", "n = 7", "x = 5,25" });
+                new[] { "f(x) = ln(1 + x) - exp(x)", "[a, b] = [1, 10]", "m = 15", "n = 7", "x = 5,25" });
 
             Console.WriteLine("Enter parameters or enter nothing to use default values\n");
             Console.WriteLine("Enter the source table size:");
