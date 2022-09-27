@@ -7,11 +7,11 @@ namespace Lab2
 {
     public class Program
     {
-        static Func<double, double> defaultFunction = x => Math.Exp(-x) - x * x / 2;
-        static (double a, double b) defaultSector = (0, 1);
+        static Func<double, double> defaultFunction = x => Math.Log(1 + x) - Math.Exp(x);
+        static (double a, double b) defaultSector = (1, 10);
         const int DefaultSourceTableSize = 15;
         const int DefaultPolynomDegree = 7;
-        const double defaultInterpolationPoint = 0.65;
+        const double defaultInterpolationPoint = 5.25;
 
         static List<(double, double)> GetSourceTable(int sourceTableSize, (double a, double b) sector, Func<double, double> function)
         {
@@ -62,7 +62,7 @@ namespace Lab2
         static void Main(string[] args)
         {
             CUIHelpers.CUIHelpers.Introduce(2, "Algebraic interpolation problem",
-                new[] { "f(x) = exp(-x) - x^2/2", "[a, b] = [0, 1]", "m = 15", "n = 7", "x = 0,65" });
+                new[] { "f(x) ln(1 + x) - exp(x)", "[a, b] = [1, 10]", "m = 15", "n = 7", "x = 5,25" });
 
             Console.WriteLine("Enter parameters or enter nothing to use default values\n");
             Console.WriteLine("Enter the source table size:");

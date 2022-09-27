@@ -46,7 +46,7 @@ namespace CUIHelpers
             return EnterParameter<T>(convert, predicate, (ex, res) => Console.WriteLine("Enter correct parameter"));
         }
 
-        static IEnumerable<string> Introduction(int number, string problem, string[] defaultParameters, int variant = 5)
+        static IEnumerable<string> Introduction(int number, string problem, string[] defaultParameters, int variant = 13)
         {
             yield return $"Labaratory work {number}";
             yield return problem;
