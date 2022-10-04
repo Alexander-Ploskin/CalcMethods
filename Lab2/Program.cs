@@ -13,30 +13,6 @@ namespace Lab2
         const int DefaultPolynomDegree = 7;
         const double defaultInterpolationPoint = 5.25;
 
-        static List<(double, double)> GetSourceTable(int sourceTableSize, (double a, double b) sector, Func<double, double> function)
-        {
-            if(sector.b <= sector.a)
-            {
-                throw new ArgumentException("Invalid sector");
-            }
-            var distance = (sector.b - sector.a) / sourceTableSize;
-            return Enumerable.Range(0, sourceTableSize).Select(i =>
-                {
-                    var point = sector.a + i * distance;
-                    return (point, function(point));
-                }).ToList();
-        }
-
-        static void PrintSourceTable(List<(double x, double fx)> sourceTable)
-        {
-            Console.WriteLine();
-            for(int i = 0; i < sourceTable.Count; ++i)
-            {
-                Console.WriteLine($"X_{i} = {sourceTable[i].x}, F(X_{i}) = {sourceTable[i].fx}");
-            }
-            Console.WriteLine();
-        }
-
         static void PrintMethodResult(string methodName, double methodResult, double functionValue)
         {
             Console.WriteLine($"The {methodName} result = {methodResult}");
@@ -48,7 +24,7 @@ namespace Lab2
             sourceTable.Sort((first, second) => Math.Sign(Math.Abs(interpolationPoint - first.Item1) - Math.Abs(interpolationPoint - second.Item1)));
             Console.WriteLine();
             Console.WriteLine("Sorted table:");
-            PrintSourceTable(sourceTable);
+            CUIHelpers.CUIHelpers.PrintSourceTable(sourceTable);
 
             var lagrangeResult = AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, interpolationPoint, AlgebraicInterpolaion.Method.Lagrange);
             var newthonResult = AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, interpolationPoint, AlgebraicInterpolaion.Method.Newton);
@@ -61,7 +37,7 @@ namespace Lab2
 
         static void Main(string[] args)
         {
-            CUIHelpers.CUIHelpers.Introduce(2, "Algebraic interpolation problem",
+            CUIHelpers.CUIHelpers.Introduce("2", "Algebraic interpolation problem",
                 new[] { "f(x) = ln(1 + x) - exp(x)", "[a, b] = [1, 10]", "m = 15", "n = 7", "x = 5,25" });
 
             Console.WriteLine("Enter parameters or enter nothing to use default values\n");
@@ -74,9 +50,9 @@ namespace Lab2
             Console.WriteLine("Enter the value for right border of the interpolation sector");
             var rightBorder = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x) && x > leftBorder,
                 (ex, res) => Console.WriteLine("Enter a correct value for right border"), defaultSector.b);
-            var sourceTable = GetSourceTable(sourceTableSize, (leftBorder, rightBorder), defaultFunction);
+            var sourceTable = AlgebraicInterpolaion.GetSourceTable(sourceTableSize, (leftBorder, rightBorder), defaultFunction);
             Console.WriteLine("Source table:");
-            PrintSourceTable(sourceTable);
+            CUIHelpers.CUIHelpers.PrintSourceTable(sourceTable);
 
             var shouldContinue = 1;
 

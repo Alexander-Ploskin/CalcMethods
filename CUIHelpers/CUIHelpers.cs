@@ -9,15 +9,39 @@ namespace CUIHelpers
         public static T EnterParameter<T>(Func<string, T> convert,
                                           Predicate<T> predicate,
                                           Action<string, string> notifyFaiure,
-                                          T defaultValue = default(T))
+                                          T defaultValue,
+                                          string getMessage = null)
         {
+            return EnterParameter(convert, predicate, notifyFaiure, true, defaultValue, getMessage);
+        }
+
+        public static T EnterParameter<T>(Func<string, T> convert,
+                                          Predicate<T> predicate,
+                                          Action<string, string> notifyFaiure,
+                                          string getMessage = null)
+        {
+            return EnterParameter(convert, predicate, notifyFaiure, false, default(T), getMessage);
+        }
+
+        static T EnterParameter<T>(Func<string, T> convert,
+                                   Predicate<T> predicate,
+                                   Action<string, string> notifyFaiure,
+                                   bool useDefaultValue,
+                                   T defaultValue = default(T),
+                                   string getMessage = null)
+        {
+            if(getMessage != null)
+            {
+                Console.WriteLine(getMessage);
+            }
+
             var result = default(T);
             while(true)
             {
                 try
                 {
                     var input = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(input) && predicate(defaultValue))
+                    if (useDefaultValue && string.IsNullOrWhiteSpace(input) && predicate(defaultValue))
                     {
                         return defaultValue;
                     } 
@@ -46,7 +70,7 @@ namespace CUIHelpers
             return EnterParameter<T>(convert, predicate, (ex, res) => Console.WriteLine("Enter correct parameter"));
         }
 
-        static IEnumerable<string> Introduction(int number, string problem, string[] defaultParameters, int variant = 13)
+        static IEnumerable<string> Introduction(string number, string problem, string[] defaultParameters, int variant = 13)
         {
             yield return $"Labaratory work {number}";
             yield return problem;
@@ -55,13 +79,33 @@ namespace CUIHelpers
 
         }
 
-        public static void Introduce(int number, string problem, string[] defaultParameters, int variant = 13)
+        public static void Introduce(string number, string problem, string[] defaultParameters, int variant = 13)
         {
             foreach(var message in Introduction(number, problem, defaultParameters, variant))
             {
                 Console.WriteLine(message);
                 Console.WriteLine();
             }
+        }
+
+        public static void PrintSourceTable(List<(double x, double fx)> sourceTable)
+        {
+            Console.WriteLine();
+            for(int i = 0; i < sourceTable.Count; ++i)
+            {
+                Console.WriteLine($"X_{i} = {sourceTable[i].x}, F(X_{i}) = {sourceTable[i].fx}");
+            }
+            Console.WriteLine();
+        }
+
+        public static void PrintReversedSourceTable(List<(double x, double fx)> sourceTable)
+        {
+            Console.WriteLine();
+            for (int i = 0; i < sourceTable.Count; ++i)
+            {
+                Console.WriteLine($"F(X_{i}) = {sourceTable[i].x}, F^(-1)(F(X_{i})) = {sourceTable[i].fx}");
+            }
+            Console.WriteLine();
         }
     }
 }

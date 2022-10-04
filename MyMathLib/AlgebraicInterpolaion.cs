@@ -61,5 +61,19 @@ namespace MyMathLib
                 _ => throw new ArgumentException("Unknown value for Method")
             };
         }
+
+        public static List<(double, double)> GetSourceTable(int sourceTableSize, (double a, double b) sector, Func<double, double> function)
+        {
+            if (sector.b <= sector.a)
+            {
+                throw new ArgumentException("Invalid sector");
+            }
+            var distance = (sector.b - sector.a) / sourceTableSize;
+            return Enumerable.Range(0, sourceTableSize).Select(i =>
+            {
+                var point = sector.a + i * distance;
+                return (point, function(point));
+            }).ToList();
+        }
     }
 }
