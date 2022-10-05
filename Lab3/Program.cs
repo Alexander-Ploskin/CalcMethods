@@ -7,7 +7,7 @@ namespace Lab3
 {
     class Program
     {
-        static Func<double, double> DefaultFunction = x => Math.Log(1 + x) - Math.Exp(x);
+        static readonly Func<double, double> DefaultFunction = x => Math.Log(1 + x) - Math.Exp(x);
         static (double a, double b) DefaultSector = (1, 10);
         const int DefaultSourceTableSize = 100;
         const int DefaultPolynomDegree = 7;

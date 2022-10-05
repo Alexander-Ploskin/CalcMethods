@@ -7,11 +7,11 @@ namespace Lab2
 {
     public class Program
     {
-        static Func<double, double> defaultFunction = x => Math.Log(1 + x) - Math.Exp(x);
-        static (double a, double b) defaultSector = (1, 10);
+        static readonly Func<double, double> DefaultFunction = x => Math.Log(1 + x) - Math.Exp(x);
+        static readonly (double a, double b) DefaultSector = (1, 10);
         const int DefaultSourceTableSize = 15;
         const int DefaultPolynomDegree = 7;
-        const double defaultInterpolationPoint = 5.25;
+        const double DefaultInterpolationPoint = 5.25;
 
         static void PrintMethodResult(string methodName, double methodResult, double functionValue)
         {
@@ -28,7 +28,7 @@ namespace Lab2
 
             var lagrangeResult = AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, interpolationPoint, AlgebraicInterpolaion.Method.Lagrange);
             var newthonResult = AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, interpolationPoint, AlgebraicInterpolaion.Method.Newton);
-            var actualResult = defaultFunction(interpolationPoint);
+            var actualResult = DefaultFunction(interpolationPoint);
 
             PrintMethodResult("Lagrange method", lagrangeResult, actualResult);
             Console.WriteLine();
@@ -46,11 +46,11 @@ namespace Lab2
                     (ex, res) => Console.WriteLine("Enter a correct value for the source table size"), DefaultSourceTableSize);
             Console.WriteLine("Enter the value for left border of the interpolation sector");
             var leftBorder = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x),
-                (ex, res) => Console.WriteLine("Enter a correct value for left border"), defaultSector.a);
+                (ex, res) => Console.WriteLine("Enter a correct value for left border"), DefaultSector.a);
             Console.WriteLine("Enter the value for right border of the interpolation sector");
             var rightBorder = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x) && x > leftBorder,
-                (ex, res) => Console.WriteLine("Enter a correct value for right border"), defaultSector.b);
-            var sourceTable = AlgebraicInterpolaion.GetSourceTable(sourceTableSize, (leftBorder, rightBorder), defaultFunction);
+                (ex, res) => Console.WriteLine("Enter a correct value for right border"), DefaultSector.b);
+            var sourceTable = AlgebraicInterpolaion.GetSourceTable(sourceTableSize, (leftBorder, rightBorder), DefaultFunction);
             Console.WriteLine("Source table:");
             CUIHelpers.CUIHelpers.PrintSourceTable(sourceTable);
 
@@ -64,7 +64,7 @@ namespace Lab2
                     (ex, res) => Console.WriteLine("Enter a correct value for polynom degree"), DefaultPolynomDegree);
                 Console.WriteLine("Enter the interpolation point:");
                 var interpolationPoint = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x),
-                    (ex, res) => Console.WriteLine("Enter a correct value for interpolaion point"), defaultInterpolationPoint);
+                    (ex, res) => Console.WriteLine("Enter a correct value for interpolaion point"), DefaultInterpolationPoint);
 
                 GetValueInPoint(sourceTable, interpolationPoint, polynomDegree);
 

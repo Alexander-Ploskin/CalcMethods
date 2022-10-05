@@ -1,11 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConsoleTables;
 
 namespace CUIHelpers
 {
     public static class CUIHelpers
     {
+        public static void PrintTable(string[] columns, object[,] rows)
+        {
+            if(columns.Length != rows.GetLength(1))
+            {
+                throw new ArgumentException();
+            }
+            var table = new ConsoleTable(columns);
+            for(int i = 0; i < rows.GetLength(0); ++i)
+            {
+                table.AddRow(rows[i, 0], rows[i, 1], rows[i, 2], rows[i, 3], rows[i, 4], rows[i, 5]);
+            }
+            table.Write();
+        }
+
         public static T EnterParameter<T>(Func<string, T> convert,
                                           Predicate<T> predicate,
                                           Action<string, string> notifyFaiure,
@@ -35,7 +50,7 @@ namespace CUIHelpers
                 Console.WriteLine(getMessage);
             }
 
-            var result = default(T);
+            T result;
             while(true)
             {
                 try
