@@ -30,7 +30,7 @@ namespace Lab3._2
             var step = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x),
                 (ex, res) => Console.WriteLine("The value is not correct"), DefaultStep, "Enter the step for the table");
             var numberOfValues = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 3,
-                (ex, res) => Console.WriteLine("The value is not correct"), DefaultNumberOfValues, "Enter the value for the start point");
+                (ex, res) => Console.WriteLine("The value is not correct"), DefaultNumberOfValues, "Enter the number of values in the table");
 
             var sourceTable = NumericalDifferentiation.GetSourceTable(startPoint, step, numberOfValues, DefaultFunction);
             Console.WriteLine("Source table:");
