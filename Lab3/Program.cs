@@ -69,7 +69,8 @@ namespace Lab3
                 (ex, res) => Console.WriteLine("The value is not correct"), getMessage: "Enter the value for the right border for the bisection method");
 
             var lagrangeResult = AlgebraicInterpolaion.GetInterpolationPolynome(reversedSourceTable, polynomDegree, functionValue, AlgebraicInterpolaion.Method.Lagrange);
-            var bisectionResult = NonLinearEquations.FindRoot(x => function(x) - functionValue, (leftBorder, rightBorder), BisectionMethodAccuracy, NonLinearEquations.Method.BisectionMetod);
+            var getPolynome = new Func<double, double>(x => AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, x, AlgebraicInterpolaion.Method.Lagrange));
+            var bisectionResult = NonLinearEquations.FindRoot(x => getPolynome(x) - functionValue, (leftBorder, rightBorder), BisectionMethodAccuracy, NonLinearEquations.Method.BisectionMetod);
 
             PrintMethodResult("Lagrange method", lagrangeResult, functionValue, function);
             Console.WriteLine();
