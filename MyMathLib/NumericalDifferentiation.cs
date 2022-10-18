@@ -10,7 +10,8 @@ namespace MyMathLib
         {
             var h = sourceTable[1].Item1 - sourceTable[0].Item1;
             var lastIndex = sourceTable.Count - 1;
-            return sourceTable.Skip(1).SkipLast(1).Select((x, i) => (x.Item1, (sourceTable[i + 2].Item2 - sourceTable[i].Item2) / (2 * h)))
+            return sourceTable.Skip(1).SkipLast(1)
+                .Select((x, i) => (x.Item1, (sourceTable[i + 2].Item2 - sourceTable[i].Item2) / (2 * h)))
                 .Prepend((sourceTable[0].Item1, (-3 * sourceTable[0].Item2 + 4 * sourceTable[1].Item2 - sourceTable[2].Item2) / (2 * h)))
                 .Append((sourceTable.Last().Item1, (3 * sourceTable.Last().Item2 - 4 * sourceTable[lastIndex - 1].Item2 + sourceTable[lastIndex - 2].Item2) / (2 * h)))
                 .ToList();

@@ -68,6 +68,8 @@ namespace Lab3
             var rightBorder = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x) && x > leftBorder,
                 (ex, res) => Console.WriteLine("The value is not correct"), getMessage: "Enter the value for the right border for the bisection method");
 
+            sourceTable = sourceTable.OrderBy(x => Math.Abs(x.Item2 - functionValue)).ToList();
+
             var lagrangeResult = AlgebraicInterpolaion.GetInterpolationPolynome(reversedSourceTable, polynomDegree, functionValue, AlgebraicInterpolaion.Method.Lagrange);
             var getPolynome = new Func<double, double>(x => AlgebraicInterpolaion.GetInterpolationPolynome(sourceTable, polynomDegree, x, AlgebraicInterpolaion.Method.Lagrange));
             var bisectionResult = NonLinearEquations.FindRoot(x => getPolynome(x) - functionValue, (leftBorder, rightBorder), BisectionMethodAccuracy, NonLinearEquations.Method.BisectionMetod);
