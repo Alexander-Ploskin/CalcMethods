@@ -16,7 +16,7 @@ class Program
                 $"Default value for the left border: {DefaultLeftBorder}",
                 $"Default value for the right border: {DefaultRightBorder}",
             });
-        Console.WriteLine("Default roots:");
+        Console.WriteLine("Default nodes:");
         defaultNodes.ForEach(x => Console.WriteLine($"X_{defaultNodes.IndexOf(x)}: {x}"));
 
         Console.WriteLine();
