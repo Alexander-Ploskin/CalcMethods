@@ -47,10 +47,10 @@ namespace Lab3._2
                 resultTable[i, 0] = sourceTable[i].Item1;
                 resultTable[i, 1] = sourceTable[i].Item2;
                 resultTable[i, 2] = firstDerivatives[i].Item2;
-                resultTable[i, 3] = Math.Abs(DefaultFunctionFirstDerivative(sourceTable[i].Item1) - firstDerivatives[i].Item2);
+                resultTable[i, 3] = Math.Abs((DefaultFunctionFirstDerivative(sourceTable[i].Item1) - firstDerivatives[i].Item2) / firstDerivatives[i].Item2);
                 resultTable[i, 4] = secondDerivatives[i].Item2;
                 resultTable[i, 5] = secondDerivatives[i].Item2.HasValue
-                    ? (double?)Math.Abs(DefaultFunctionSecondDerivative(sourceTable[i].Item1) - secondDerivatives[i].Item2.Value)
+                    ? (double?)Math.Abs((DefaultFunctionSecondDerivative(sourceTable[i].Item1) - secondDerivatives[i].Item2.Value) / secondDerivatives[i].Item2.Value)
                     : null;
             }
 
