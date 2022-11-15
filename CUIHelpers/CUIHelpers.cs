@@ -9,16 +9,46 @@ namespace CUIHelpers
     {
         public static void PrintTable(string[] columns, object[,] rows)
         {
-            if(columns.Length != rows.GetLength(1))
+            if (columns.Length != rows.GetLength(1))
             {
                 throw new ArgumentException();
             }
             var table = new ConsoleTable(columns);
-            for(int i = 0; i < rows.GetLength(0); ++i)
+            for (int i = 0; i < rows.GetLength(0); ++i)
             {
                 table.AddRow(rows[i, 0], rows[i, 1], rows[i, 2], rows[i, 3], rows[i, 4], rows[i, 5]);
             }
             table.Write();
+        }
+
+        public static IEnumerable<T> EnterParameters<T>(Func<string, T> convert,
+                                                        Predicate<T> predicate,
+                                                        Action<string, string> notifyFaiure,
+                                                        IEnumerable<T> defaultValue,
+                                                        string getMessage = null)
+        {
+            if (getMessage != null)
+            {
+                Console.WriteLine(getMessage);
+            }
+            var numberOfValues = EnterParameter(i => int.Parse(i), x => x >= 0,
+                (ex, res) => Console.WriteLine("The value is not correct"), 0, "Enter the number of values or space to use default parameters");
+
+            if (numberOfValues == 0)
+            {
+                foreach(var item in defaultValue)
+                {
+                    yield return item;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < numberOfValues; ++i)
+                {
+                    yield return EnterParameter(i => convert(i), x => predicate(x), notifyFaiure, "Enter new parameter:");
+                }
+            }
+
         }
 
         public static T EnterParameter<T>(Func<string, T> convert,
@@ -45,13 +75,13 @@ namespace CUIHelpers
                                    T defaultValue = default(T),
                                    string getMessage = null)
         {
-            if(getMessage != null)
+            if (getMessage != null)
             {
                 Console.WriteLine(getMessage);
             }
 
             T result;
-            while(true)
+            while (true)
             {
                 try
                 {
@@ -59,14 +89,14 @@ namespace CUIHelpers
                     if (useDefaultValue && string.IsNullOrWhiteSpace(input) && predicate(defaultValue))
                     {
                         return defaultValue;
-                    } 
+                    }
                     else if (string.IsNullOrWhiteSpace(input))
                     {
                         notifyFaiure(null, defaultValue.ToString());
                         continue;
                     }
                     result = convert(input);
-                    if(!predicate(result))
+                    if (!predicate(result))
                     {
                         notifyFaiure(null, input);
                         continue;
@@ -96,7 +126,7 @@ namespace CUIHelpers
 
         public static void Introduce(string number, string problem, string[] defaultParameters, int variant = 13)
         {
-            foreach(var message in Introduction(number, problem, defaultParameters, variant))
+            foreach (var message in Introduction(number, problem, defaultParameters, variant))
             {
                 Console.WriteLine(message);
                 Console.WriteLine();
@@ -106,7 +136,7 @@ namespace CUIHelpers
         public static void PrintSourceTable(List<(double x, double fx)> sourceTable)
         {
             Console.WriteLine();
-            for(int i = 0; i < sourceTable.Count; ++i)
+            for (int i = 0; i < sourceTable.Count; ++i)
             {
                 Console.WriteLine($"X_{i} = {sourceTable[i].x}, F(X_{i}) = {sourceTable[i].fx}");
             }
