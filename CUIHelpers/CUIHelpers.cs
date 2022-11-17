@@ -16,7 +16,8 @@ namespace CUIHelpers
             var table = new ConsoleTable(columns);
             for (int i = 0; i < rows.GetLength(0); ++i)
             {
-                table.AddRow(rows[i, 0], rows[i, 1], rows[i, 2], rows[i, 3], rows[i, 4], rows[i, 5]);
+                var values = Enumerable.Range(0, rows.GetLength(1)).Select(j => rows[i, j]).ToArray();
+                table.AddRow(values);
             }
             table.Write();
         }
