@@ -5,6 +5,11 @@ namespace MyMathLib
 {
     public static class CompositeQuadratureFormulas
     {
+        public static double CalcTheoreticalErrorForGrowingFunction(double constant, int accuracyDegree, double a, double b, double h, Func<double, double> func)
+        {
+            return constant * func(b) * (b - a) * Math.Pow(h, accuracyDegree);
+        }
+
         public static double LeftRectangle(double a, double b, int partitionsCount, Func<double, double> func)
         {
             var step = (b - a) / partitionsCount;

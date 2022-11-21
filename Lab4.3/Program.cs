@@ -5,20 +5,25 @@ namespace Lab4._3
 {
     internal class Program
     {
-        const double DefaultLeftBorder = 1.5;
-        const double DefaultRightBorder = 2.5;
-        const int DefaultNumberOfPartitions = 10;
+        const double DefaultLeftBorder = 1;
+        const double DefaultRightBorder = 6;
+        const int DefaultNumberOfPartitions = 5000;
 
-        const string StringF = "f(x) = Ln(x) * Exp(x)";
-        static readonly Func<double, double> F = x => Math.Log(x) * Math.Exp(x);
+        const string StringF = "f(x) = Exp(x)";
+        static readonly Func<double, double> F = x => Math.Exp(x);
+        static readonly Func<double, double> FAntiderivative = x => Math.Exp(x);
         const string StringF_0 = "f_0(x) = 4";
         static readonly Func<double, double> F_0 = x => 4;
+        static readonly Func<double, double> F_0Antiderivative = x => 4 * x;
         const string StringF_1 = "f_1(x) = 4 * x";
         static readonly Func<double, double> F_1 = x => 4 * x;
+        static readonly Func<double, double> F_1Antiderivative = x => 2 * Math.Pow(x, 2);
         const string StringF_2 = "f_2(x) = 4 * x^2 + 16 * x";
         static readonly Func<double, double> F_2 = x => 4 * Math.Pow(x, 2) + 16 * x;
+        static readonly Func<double, double> F_2Antiderivative = x => (4d / 3d) * Math.Pow(x, 3) + 8 * Math.Pow(x, 2);
         const string StringF_3 = "f_3(x) = 4 * x^3 + 16 * x^2 + 64 * x";
-        static readonly Func<double, double> F_3 = x => 4 * Math.Pow(x, 3) + 16 * Math.Pow(x, 2) + 64 * Math.Pow(x, 3);
+        static readonly Func<double, double> F_3 = x => 4 * Math.Pow(x, 3) + 16 * Math.Pow(x, 2) + 64 * x;
+        static readonly Func<double, double> F_3Antiderivative = x => Math.Pow(x, 4) + (16d / 3d) * Math.Pow(x, 3) + 32 * Math.Pow(x, 2);
 
         static void Main(string[] args)
         {
@@ -31,6 +36,7 @@ namespace Lab4._3
                 StringF_3,
                 $"Default value for the left border: {DefaultLeftBorder}",
                 $"Default value for the right border: {DefaultRightBorder}",
+                $"Default value for the number of partitions: {DefaultNumberOfPartitions}"
             });
 
             var leftBorder = CUIHelpers.CUIHelpers.EnterParameter(i => double.Parse(i), x => double.IsFinite(x),
@@ -42,18 +48,18 @@ namespace Lab4._3
             Console.WriteLine($"Step: {(rightBorder - leftBorder) / partitionsCount}");
             Console.WriteLine();
 
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF, true, F);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_0, false, F_0);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_1, false, F_1);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_2, false, F_2);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_3, false,F_3);
+            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_0, false, F_0, F_0Antiderivative);
+            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_1, false, F_1, F_1Antiderivative);
+            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_2, false, F_2, F_2Antiderivative);
+            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_3, false, F_3, F_3Antiderivative);
+            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF, true, F, FAntiderivative);
         }
 
-        static void CalcIntegral(double a, double b, int partitionsCount, string stringFunc, bool printTheoreticalError, Func<double, double> func)
+        static void CalcIntegral(double a, double b, int partitionsCount, string stringFunc, bool printTheoreticalError, Func<double, double> func, Func<double, double> antiderivative)
         {
             Console.WriteLine($"Results for {stringFunc}");
 
-            var exactValue = MyMathLib.Integration.CalcIntegralExactly(a, b, func);
+            var exactValue = antiderivative(b) - antiderivative(a);
 
             var resultTableHeader = new List<string> { "Method", "Result", "Absolute error", "Relative error" };
             if (printTheoreticalError)
@@ -104,13 +110,14 @@ namespace Lab4._3
             resultTable[3, 3] = trapezoidRelativeError;
             resultTable[4, 3] = simpsonRelativeError;
 
-            var leftRectTheoreticalError = (1d / 2d) * Math.Abs(func(b)) * (b - a) * ((b - a) / partitionsCount);
-            var rightRectTheoreticalError = (1d / 2d) * Math.Abs(func(b)) * (b - a) * ((b - a) / partitionsCount);
-            var centerRectTheoreticalError = (1d / 24d) * Math.Abs(Math.Pow(func(b), 2)) * (b - a) * Math.Pow((b - a) / partitionsCount, 2);
-            var trapezoidTheoreticalError = (1d / 12d) * Math.Abs(Math.Pow(func(b), 2)) * (b - a) * Math.Pow((b - a) / partitionsCount, 2);
-            var simpsonTheoreticalError = (1d / 2880d) * Math.Abs(Math.Pow(func(b), 4)) * (b - a) * Math.Pow((b - a) / partitionsCount, 4);
+            var h = (b - a) / partitionsCount;
+            var leftRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2d), 0, a, b, h, func);
+            var rightRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2d), 0, a, b, h, func);
+            var centerRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 24d), 1, a, b, h, func);
+            var trapezoidTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 12d), 1, a, b, h, func);
+            var simpsonTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2880d), 3, a, b, h, func);
 
-            if(printTheoreticalError)
+            if (printTheoreticalError)
             {
                 resultTable[0, 4] = leftRectTheoreticalError;
                 resultTable[1, 4] = rightRectTheoreticalError;
