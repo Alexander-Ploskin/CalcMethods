@@ -1,13 +1,26 @@
-﻿using System;
+﻿using MyMathLib;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab4._3
 {
     internal class Program
     {
+        struct IntegralCalculationResult
+        {
+            public CalculationMethod method;
+            public double exactValue;
+            public double result;
+            public double absoluteError;
+            public double relativeError;
+            public double theoreticalError;
+        }
+
         const double DefaultLeftBorder = 1;
         const double DefaultRightBorder = 6;
         const int DefaultNumberOfPartitions = 5000;
+        const int DefaultPartitionsCountFactor = 10;
 
         const string StringF = "f(x) = Exp(x)";
         static readonly Func<double, double> F = x => Math.Exp(x);
@@ -45,92 +58,115 @@ namespace Lab4._3
                 (ex, res) => Console.WriteLine("The value is not correct"), DefaultRightBorder, "Enter the value for the right border");
             var partitionsCount = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 0,
                 (ex, res) => Console.WriteLine("The value is not correct"), DefaultNumberOfPartitions, "Enter the number of partitions");
+
             Console.WriteLine($"Step: {(rightBorder - leftBorder) / partitionsCount}");
             Console.WriteLine();
 
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_0, false, F_0, F_0Antiderivative);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_1, false, F_1, F_1Antiderivative);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_2, false, F_2, F_2Antiderivative);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF_3, false, F_3, F_3Antiderivative);
-            CalcIntegral(leftBorder, rightBorder, partitionsCount, StringF, true, F, FAntiderivative);
+            var polynoms = new[] {
+                (StringF_0, F_0, F_0Antiderivative),
+                (StringF_1, F_1, F_1Antiderivative),
+                (StringF_2, F_2, F_2Antiderivative),
+                (StringF_3, F_3, F_3Antiderivative),
+            };
+
+            foreach (var func in polynoms)
+            {
+                var result = CalcIntegral(leftBorder, rightBorder, partitionsCount, func.Item2, func.Item3);
+                PrintResults(result, func.Item1, false);
+            }
+
+            var funcResult = CalcIntegral(leftBorder, rightBorder, partitionsCount, F, FAntiderivative);
+            PrintResults(funcResult, StringF, true);
+
+            var partitionsCountFactor = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 0,
+                (ex, res) => Console.WriteLine("The value is not correct"), DefaultPartitionsCountFactor, "Enter l:");
+            Console.WriteLine($"h: {(rightBorder - leftBorder) / partitionsCount}");
+            partitionsCount *= partitionsCountFactor;
+            Console.WriteLine($"h / l: {(rightBorder - leftBorder) / partitionsCount}");
+            Console.WriteLine();
+
+            var newResults = CalcIntegral(leftBorder, rightBorder, partitionsCount, F, FAntiderivative);
+            PrintResults(newResults, StringF, false);
+
+            var refinedResults = RefineResults(funcResult, newResults, partitionsCountFactor);
+            Console.WriteLine("Refined results:");
+            PrintResults(refinedResults, StringF, false);
         }
 
-        static void CalcIntegral(double a, double b, int partitionsCount, string stringFunc, bool printTheoreticalError, Func<double, double> func, Func<double, double> antiderivative)
+        static List<IntegralCalculationResult> CalcIntegral(double a, double b, int partitionsCount, Func<double, double> func, Func<double, double> antiderivative)
         {
-            Console.WriteLine($"Results for {stringFunc}");
-
             var exactValue = antiderivative(b) - antiderivative(a);
 
+            var methods = Enum.GetValues(typeof(CalculationMethod)) as CalculationMethod[];
+            var results = new List<IntegralCalculationResult>();
+            for (int i = 0; i < methods.Length; ++i)
+            {
+                var resultValue = CompositeQuadratureFormulas.CalcIntegral(methods[i], a, b, partitionsCount, func);
+                var absoluteError = Math.Abs(exactValue - resultValue);
+                var relativeError = exactValue != 0 ? absoluteError / Math.Abs(exactValue) : -1;
+                var h = (b - a) / partitionsCount;
+                var theoreticalError = CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction(methods[i], a, b, h, func);
+                results.Add(new IntegralCalculationResult
+                {
+                    method = methods[i],
+                    result = resultValue,
+                    exactValue = exactValue,
+                    absoluteError = absoluteError,
+                    relativeError = relativeError,
+                    theoreticalError = theoreticalError
+                });
+            }
+            return results;
+        }
+
+        static List<IntegralCalculationResult> RefineResults(List<IntegralCalculationResult> oldResults, List<IntegralCalculationResult> newResults, int partitionsCountFactor)
+        {
+            var refinedResults = new List<IntegralCalculationResult>();
+            for (int i = 0; i < oldResults.Count; ++i)
+            {
+                var oldResult = oldResults[i];
+                var newResult = newResults[i];
+
+                var refinedResultValue = CompositeQuadratureFormulas.Refine(oldResult.method.GetAccuracyDegree(), oldResult.result, newResult.result, partitionsCountFactor);
+                var absoluteError = Math.Abs(oldResult.exactValue - refinedResultValue);
+                var relativeError = oldResult.exactValue != 0 ? absoluteError / oldResult.exactValue : -1;
+                refinedResults.Add(new IntegralCalculationResult
+                {
+                    method = oldResult.method,
+                    exactValue = oldResult.exactValue,
+                    result = refinedResultValue,
+                    absoluteError = absoluteError,
+                    relativeError = relativeError
+                });
+            }
+            return refinedResults;
+        }
+
+        static void PrintResults(List<IntegralCalculationResult> results, string stringFunc, bool printTheoreticalError)
+        {
             var resultTableHeader = new List<string> { "Method", "Result", "Absolute error", "Relative error" };
             if (printTheoreticalError)
             {
                 resultTableHeader.Add("Theoretical error");
             }
             var resultTable = new object[5, resultTableHeader.Count];
-
-            resultTable[0, 0] = "Left rectangle";
-            resultTable[1, 0] = "Right rectangle";
-            resultTable[2, 0] = "Center rectangle";
-            resultTable[3, 0] = "Trapezoid";
-            resultTable[4, 0] = "Simpson";
-
-            var leftRect = MyMathLib.CompositeQuadratureFormulas.LeftRectangle(a, b, partitionsCount, func);
-            var rightRect = MyMathLib.CompositeQuadratureFormulas.RightRectangle(a, b, partitionsCount, func);
-            var centerRect = MyMathLib.CompositeQuadratureFormulas.CenterRectangle(a, b, partitionsCount, func);
-            var trapezoid = MyMathLib.CompositeQuadratureFormulas.Trapezoid(a, b, partitionsCount, func);
-            var simpson = MyMathLib.CompositeQuadratureFormulas.Simpson(a, b, partitionsCount, func);
             
-            resultTable[0, 1] = leftRect;
-            resultTable[1, 1] = rightRect;
-            resultTable[2, 1] = centerRect;
-            resultTable[3, 1] = trapezoid;
-            resultTable[4, 1] = simpson;
-
-            var leftRectAbsError = Math.Abs(exactValue - leftRect);
-            var rightRectAbsError = Math.Abs(exactValue - rightRect);
-            var centerRectAbsError = Math.Abs(exactValue - centerRect);
-            var trapezoidAbsError = Math.Abs(exactValue - trapezoid);
-            var simpsonAbsError = Math.Abs(exactValue - simpson);
-
-            resultTable[0, 2] = leftRectAbsError;
-            resultTable[1, 2] = rightRectAbsError;
-            resultTable[2, 2] = centerRectAbsError;
-            resultTable[3, 2] = trapezoidAbsError;
-            resultTable[4, 2] = simpsonAbsError;
-
-            var leftRectRelativeError = exactValue != 0 ? leftRectAbsError / Math.Abs(exactValue) : -1;
-            var rightRectRelativeError = exactValue != 0 ? rightRectAbsError / Math.Abs(exactValue) : -1;
-            var centerRectRelativeError = exactValue != 0 ? centerRectAbsError / Math.Abs(exactValue) : -1;
-            var trapezoidRelativeError = exactValue != 0 ? trapezoidAbsError / Math.Abs(exactValue) : -1;
-            var simpsonRelativeError = exactValue != 0 ? simpsonAbsError / Math.Abs(exactValue) : -1;
-
-            resultTable[0, 3] = leftRectRelativeError;
-            resultTable[1, 3] = rightRectRelativeError;
-            resultTable[2, 3] = centerRectRelativeError;
-            resultTable[3, 3] = trapezoidRelativeError;
-            resultTable[4, 3] = simpsonRelativeError;
-
-            var h = (b - a) / partitionsCount;
-            var leftRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2d), 0, a, b, h, func);
-            var rightRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2d), 0, a, b, h, func);
-            var centerRectTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 24d), 1, a, b, h, func);
-            var trapezoidTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 12d), 1, a, b, h, func);
-            var simpsonTheoreticalError = MyMathLib.CompositeQuadratureFormulas.CalcTheoreticalErrorForGrowingFunction((1 / 2880d), 3, a, b, h, func);
-
-            if (printTheoreticalError)
+            for(int i = 0; i < results.Count; ++i)
             {
-                resultTable[0, 4] = leftRectTheoreticalError;
-                resultTable[1, 4] = rightRectTheoreticalError;
-                resultTable[2, 4] = centerRectTheoreticalError;
-                resultTable[3, 4] = trapezoidTheoreticalError;
-                resultTable[4, 4] = simpsonTheoreticalError;
+                var result = results[i];
+                resultTable[i, 0] = result.method.ToString();
+                resultTable[i, 1] = result.result;
+                resultTable[i, 2] = result.absoluteError;
+                resultTable[i, 3] = result.relativeError;
+                if(printTheoreticalError)
+                {
+                    resultTable[i, 4] = result.theoreticalError;
+                }
             }
 
-
-            Console.WriteLine($"Exact value: {exactValue}");
-
+            Console.WriteLine($"Results for {stringFunc}");
+            Console.WriteLine($"Exact value: {results[0].exactValue}");
             CUIHelpers.CUIHelpers.PrintTable(resultTableHeader.ToArray(), resultTable);
-
             Console.WriteLine();
         }
     }
