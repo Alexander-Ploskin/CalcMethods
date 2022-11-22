@@ -52,7 +52,7 @@ namespace MyMathLib
                 _ => throw new ArgumentException()
             };
             var accuracyDegree = method.GetAccuracyDegree();
-            return constant * func(b) * (b - a) * Math.Pow(h, accuracyDegree);
+            return constant * func(b) * (b - a) * Math.Pow(h, accuracyDegree + 1);
         }
 
         static double LeftRectangle(double a, double b, int partitionsCount, Func<double, double> func)
