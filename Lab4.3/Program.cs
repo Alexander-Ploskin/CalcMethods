@@ -78,6 +78,7 @@ namespace Lab4._3
             var funcResult = CalcIntegral(leftBorder, rightBorder, partitionsCount, F, FAntiderivative);
             PrintResults(funcResult, StringF, true);
 
+            Console.WriteLine($"Default value for l: {DefaultPartitionsCountFactor}");
             var partitionsCountFactor = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 0,
                 (ex, res) => Console.WriteLine("The value is not correct"), DefaultPartitionsCountFactor, "Enter l:");
             Console.WriteLine($"h: {(rightBorder - leftBorder) / partitionsCount}");
