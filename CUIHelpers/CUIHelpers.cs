@@ -19,7 +19,7 @@ namespace CUIHelpers
                 var values = Enumerable.Range(0, rows.GetLength(1)).Select(j => rows[i, j]).ToArray();
                 table.AddRow(values);
             }
-            table.Write();
+            table.Write(Format.Alternative);
         }
 
         public static IEnumerable<T> EnterParameters<T>(Func<string, T> convert,
