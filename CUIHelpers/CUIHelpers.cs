@@ -7,6 +7,16 @@ namespace CUIHelpers
 {
     public static class CUIHelpers
     {
+        public static void PrintNumeredParameters<T>(List<T> parameters, char liter, string introduction)
+        {
+            Console.WriteLine(introduction);
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                Console.WriteLine($"{liter}_{i} = {parameters[i]}");
+            }
+            Console.WriteLine();
+        }
+
         public static void PrintTable(string[] columns, object[,] rows)
         {
             if (columns.Length != rows.GetLength(1))

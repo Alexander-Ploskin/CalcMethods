@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Accord.Math" Version="3.8.0" />
+    <PackageReference Include="MathNet.Numerics.Signed" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
