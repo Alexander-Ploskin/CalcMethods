@@ -10,6 +10,7 @@ namespace MyMathLib
         public const double LeftBorder = -1;
         public const double RightBorder = 1;
         public static readonly Func<double, double> Weight = x => 1 / Math.Sqrt(1 - Math.Pow(x, 2));
+        public const string StringWeight = "1 / sqrt(1 - x^2)";
 
         public List<double> Nodes
             => Enumerable.Range(1, nodesCount).Select(x => Math.Cos(Math.PI * (2 * x - 1) / (2d * nodesCount))).ToList();

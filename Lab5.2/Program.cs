@@ -14,7 +14,6 @@ namespace Lab5._2
         static readonly int[] NodeCounts = { 4, 5, 6, 7 };
         static readonly Func<double, double> F = x => Math.Sqrt(x) * Math.Exp(Math.Pow(x, 2));
         static readonly Func<double, double> ChebyshevGaussF = x => Math.Log(2 + x) / (1 + Math.Pow(x, 3));
-        static readonly Func<double, double> ChebyshevGaussWeight = x => 1 / (1 - Math.Pow(x, 2));
 
         static void Main(string[] args)
         {
@@ -52,7 +51,7 @@ namespace Lab5._2
                 }
             }
 
-            Console.WriteLine($"Results for {StringF} from {leftBorder} to {rightBorder} given by Gauissan formula");
+            Console.WriteLine($"Results for f(x) = {StringF}, p(x) = 1 from {leftBorder} to {rightBorder} given by Gauissan formula");
             Console.WriteLine();
 
             foreach (var nodeCount in NodeCounts)
@@ -64,14 +63,15 @@ namespace Lab5._2
             }
 
             var mahlerNodeCounts = CUIHelpers.CUIHelpers.EnterParameters<int>(i => int.Parse(i), x => x > 0,
-                (ex, res) => Console.WriteLine("The value is not correct"), NodeCounts.ToList(), "Enter node counts to test Mahler formula:").ToList();
+                (ex, res) => Console.WriteLine("The value is not correct"), NodeCounts.ToList(), "Enter node counts to test Chebyshev-Gauss formula:").ToList();
 
-            Console.WriteLine($"Results for {StringChebyshevGaussF} from -1 to 1 given by Chebyshev-Gauss formula:");
+            Console.WriteLine($"Results for f(x) = {StringChebyshevGaussF}, p(x) = {ChebyshevGaussQuadrature.StringWeight}" +
+                $"from {ChebyshevGaussQuadrature.LeftBorder} to {ChebyshevGaussQuadrature.RightBorder} given by Chebyshev-Gauss formula:");
             Console.WriteLine();
 
             foreach (var nodeCount in NodeCounts)
             {
-                var f = new Func<double, double>(x => ChebyshevGaussF(x) * ChebyshevGaussWeight(x));
+                var f = new Func<double, double>(x => ChebyshevGaussF(x) * ChebyshevGaussQuadrature.Weight(x));
                 var exactValue = Integration.CalcIntegralExactly(ChebyshevGaussQuadrature.LeftBorder, ChebyshevGaussQuadrature.RightBorder, f);
                 var formula = CreateChebyshevGaussFormula(nodeCount, ChebyshevGaussF);
                 CalcIntegralWithChebyshevGaussFormula(formula, exactValue);
