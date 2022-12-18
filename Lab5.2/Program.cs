@@ -11,8 +11,8 @@ namespace Lab5._2
         const double DefaultRightBorder = 1;
         const string StringF = "f(x) = sqrt(x) * exp(x^2)";
         const string StringChebyshevGaussF = "f(x) = ln(2 + x) / (1 + x^3)";
-        static readonly int[] NodeCounts = { 4, 5, 6, 7 };
-        static readonly Func<double, double> F = x => Math.Sqrt(x) * Math.Exp(Math.Pow(x, 2));
+        static readonly int[] NodeCounts = { 3 };
+        static readonly Func<double, double> F = x => Math.Sin(x) * Math.Exp(-x);
         static readonly Func<double, double> ChebyshevGaussF = x => Math.Log(2 + x) / (1 + Math.Pow(x, 3));
 
         static void Main(string[] args)
