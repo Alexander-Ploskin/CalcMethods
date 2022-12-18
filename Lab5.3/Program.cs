@@ -6,14 +6,15 @@ namespace Lab5._3
 {
     internal class Program
     {
-        const int DefaultNumberOfPartitions = 1;
-        const int DefaultNummberOfNodes = 3;
+        const int DefaultNumberOfPartitions = 1000;
+        const int DefaultNummberOfNodes = 7;
         const double DefaultLeftBorder = 0;
         const double DefaultRightBorder = 1;
         static readonly Func<double, double> F = x => Math.Sin(x);
         static readonly Func<double, double> Weight = x => Math.Exp(-x);
         const string StringF = "f(x) = sin(x)";
         const string StringWeight = "p(x) = exp(-x)";
+        static readonly Func<double, double> FWeightAntiderivative = x => -0.5 * Math.Exp(-x) * (Math.Cos(x) + Math.Sin(x));
 
         static void Main(string[] args)
         {
@@ -50,7 +51,7 @@ namespace Lab5._3
             var numberOfPartitions = CUIHelpers.CUIHelpers.EnterParameter(i => int.Parse(i), x => x > 0,
                 (ex, res) => Console.WriteLine("The value is not correct"), DefaultNumberOfPartitions, "Enter the number of partitions");
 
-            var exactIntegral = Integration.CalcIntegralExactly(leftBorder, rightBorder, x => F(x) * Weight(x));
+            var exactIntegral = FWeightAntiderivative(rightBorder) - FWeightAntiderivative(leftBorder);
             var compoundGaussFormula = new CompoundGaussFormula(leftBorder, rightBorder, numberOfNodes, numberOfPartitions, F, Weight);
             var calculatedIntegral = compoundGaussFormula.CalculateIntegral();
             var absoluteError = Math.Abs(calculatedIntegral - exactIntegral);
